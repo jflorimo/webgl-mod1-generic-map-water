@@ -144,3 +144,36 @@ engine.runRenderLoop(function () {
 window.addEventListener("resize", function () {
 	engine.resize();
 });
+
+/*
+
+for (var i = 0; i < numberPoints; i+=3)
+{
+    if (positions[i] == pos[0] && positions[i+2] == pos[2] )
+    {
+		for ( var deg = 0; deg < 180; deg++ )
+		{
+			for (var dist = 0; dist < 20; dist++)
+			{
+				var x = dist * Math.cos(deg);
+				var y = dist * Math.sin(deg);
+				console.log("x:"+x);
+				positions[i - x * 101 * 3 + y + 1] = 10 + 10 * Math.cos( Math.PI / pos[1] * dist );
+				positions[i + x * 101 * 3 + y + 1] = 10 + 10 * Math.cos( Math.PI / pos[1] * dist );
+				positions[i - dist * 3 + 1 + 101 * 3 * x + y] = 10 + 10 * Math.cos( Math.PI / pos[1] * dist );
+				positions[i + dist * 3 + 1 + 101 * 3 * x + y] = 10 + 10 * Math.cos( Math.PI / pos[1] * dist );
+		//	var box = BABYLON.Mesh.CreateBox("box", 1.0, scene);
+		//	box.position.x = x;
+		//box.position.z = y;
+				console.log("-------");
+			}
+		}
+		
+
+			//positions[i - y * 3 + 1] = 10 + 10 * Math.cos( Math.PI / pos[1] * y );
+			//positions[i + y * 3 + 1] = 10 + 10 * Math.cos( Math.PI / pos[1] * y );
+		
+    }
+}
+*/
+
