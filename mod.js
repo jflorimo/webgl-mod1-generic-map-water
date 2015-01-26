@@ -1,77 +1,125 @@
 var canvas = document.getElementById("renderCanvas");
 var engine = new BABYLON.Engine(canvas, true);
+var scene;
+var camera;
+var light;
 
-function mcreateGround (name, width, height, w_subdivisions, h_subdivisions, scene, updatable) {
-    var ground = new BABYLON.Mesh(name, scene);
- 
-    var indices = [];
-    var positions = [];
-    var normals = [];
-    var uvs = [];
-    var row, col;
- 
-    for (row = 0; row <= h_subdivisions; row++) {
-        for (col = 0; col <= w_subdivisions; col++) {
-            var position = new BABYLON.Vector3((col * width) / w_subdivisions - (width / 2.0), 0, ((h_subdivisions - row) * height) / h_subdivisions - (height / 2.0));
-            var normal = new BABYLON.Vector3(0, 1.0, 0);
- 
-            positions.push(position.x, position.y, position.z);
-            normals.push(normal.x, normal.y, normal.z);
-            uvs.push(col / w_subdivisions, 1.0 - row / h_subdivisions);
-        }
-    }
- 
-    for (row = 0; row < h_subdivisions; row++) {
-        for (col = 0; col < w_subdivisions; col++) {
-            indices.push(col + 1 + (row + 1) * (w_subdivisions + 1));
-            indices.push(col + 1 + row * (w_subdivisions + 1));
-            indices.push(col + row * (w_subdivisions + 1));
- 
-            indices.push(col + (row + 1) * (w_subdivisions + 1));
-            indices.push(col + 1 + (row + 1) * (w_subdivisions + 1));
-            indices.push(col + row * (w_subdivisions + 1));
-        }
-    }
- 
-    ground.setVerticesData(positions, BABYLON.VertexBuffer.PositionKind, updatable);
-    ground.setVerticesData(normals, BABYLON.VertexBuffer.NormalKind, updatable);
-    ground.setVerticesData(uvs, BABYLON.VertexBuffer.UVKind, updatable);
-    ground.setIndices(indices);
- 
-    return ground;
+var initScene = function ()
+{
+	var scene = new BABYLON.Scene(engine);
+	scene.clearColor = new BABYLON.Color3(0, 0, 0.2);
+	return scene;
 };
 
-var createScene = function () {
+var initCamera = function ()
+{
+	var camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(-20, 10, -30), scene);
+	camera.setTarget(BABYLON.Vector3.Zero());
+	camera.attachControl(canvas, false);
+	return camera;
+};
 
-// Now create a basic Babylon Scene object 
-var scene = new BABYLON.Scene(engine);
-// Change the scene background color to green.
-scene.clearColor = new BABYLON.Color3(0, 0, 0.2);
+var initLight = function ()
+{
+	var light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 1, 0), scene);
+	light.intensity = .5;
+	var d1 = new BABYLON.DirectionalLight("dir", new BABYLON.Vector3(1, -1, -2), scene);
+	d1.position = new BABYLON.Vector3(-300,300,600);
+	return light;
+};
 
-// This creates and positions a free camera
-var camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(5, 30, -80), scene);
-// This targets the camera to scene origin
-camera.setTarget(BABYLON.Vector3.Zero());
+var createLane = function (id, position)
+{
+	var lane = BABYLON.Mesh.CreateBox("lane"+id, 1, scene);
+	lane.scaling.y = 0.2;
+	lane.scaling.x = 1;
+	lane.scaling.z = 20;
 
-// This attaches the camera to the canvas
-camera.attachControl(canvas, false);
+	lane.position.x = position;
+	lane.position.y = 8;
+	lane.rotation.x = Math.PI / -3;
+};
 
-// This creates a light, aiming 0,1,0 - to the sky.
-var light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 1, 0), scene);
+Tree = function() {
+    // Call the super class BABYLON.Mesh
+    BABYLON.Mesh.call(this, "tree", scene);
+    // ...
+};
 
-// Dim the light a small amount
-light.intensity = .5;
+var createScene = function () 
+{
+
+scene = initScene();
+camera  = initCamera();
+light = initLight();
+
 /***********************************************************/
-var ground = BABYLON.Mesh.CreateGround("ground1", 100, 100, 50, scene);
-var sphere1 = BABYLON.Mesh.CreateSphere("Sphere1", 10.0, 6.0, scene);
-
-
-var materialSphere1 = new BABYLON.StandardMaterial("texture1", scene);
-materialSphere1.wireframe = true;
-sphere1.material = materialSphere1;
-ground.material = materialSphere1;
-
-
+// Fog
+//    var box = new BABYLON.Mesh(name, scene);
+//    var vertexData = BABYLON.VertexData.CreateBox(10);
+//    vertexData.applyToMesh(box, false);
+//    box.material = new BABYLON.StandardMaterial("ground", scene);
+//    box.material.diffuseColor = BABYLON.Color3.FromInts(193, 181, 151);
+//    box.material.specularColor = BABYLON.Color3.Black();
+//    box.scaling.y = 0.1;
+//    
+    var materialSphere1 = new BABYLON.StandardMaterial("texture1", scene);
+    materialSphere1.wireframe = true;
+//    box.material = materialSphere1;
+//    
+//    var positions = box.getVerticesData(BABYLON.VertexBuffer.PositionKind);
+//    console.log(positions);
+//    var indices = box.getIndices();
+//    var numberOfPoints = positions.length/3;
+//    var v3 = BABYLON.Vector3;
+//    var max = [];
+//    var i = 0;
+//    positions[i] += 20;
+//    positions[i+1] += 1;
+//    positions[i+2] += 25;
+//    
+//    box.setVerticesData(BABYLON.VertexBuffer.PositionKind, positions);
+//    var normals = [];
+//    BABYLON.VertexData.ComputeNormals(positions, indices, normals);
+//    box.setVerticesData(BABYLON.VertexBuffer.NormalKind, normals);
+//    console.log(positions);
+    
+        var pos = [0, 20, 0];
+    
+    var ground = BABYLON.Mesh.CreateGround("ground", 100, 100, 100, scene);
+    ground.material = materialSphere1;
+    
+    var positions = ground.getVerticesData("position");
+    var numberPoints = positions.length;
+    
+    for (var i = 0; i < numberPoints; i+=3)
+    {
+        if (positions[i] == pos[0] && positions[i+2] == pos[2] )
+        {
+			for (var y = 0; y < 20; y++)
+			{
+				
+				
+				
+				
+				
+				positions[i - y * 3 + 1] = 10 + 10 * Math.cos( Math.PI / pos[1] * y );
+				positions[i + y * 3 + 1] = 10 + 10 * Math.cos( Math.PI / pos[1] * y );
+				
+//				for(var j = 0; j < 20; j++)
+//				{
+//					var h = pos[1] - (y+j);
+//					if (h > 0)
+//					{
+//						positions[i - y * 3 + 1 + 101 *3 * (j+1)] = 10 + 10 * Math.cos( Math.PI / 20 * y );
+//						positions[i + y * 3 + 1 + 101 *3 * (j+1)] = 10 + 10 * Math.cos( Math.PI / 20 * y );
+//					}
+//				}
+			}
+        }
+    }
+    ground.setVerticesData(BABYLON.VertexBuffer.PositionKind, positions);
+    
 // scene.fogMode = BABYLON.Scene.FOGMODE_EXP2;
 // scene.fogDensity = 0.003;
 // scene.fogColor = new BABYLON.Color3(0.8,0.83,0.8);
@@ -81,13 +129,14 @@ ground.material = materialSphere1;
 // ground.material = new BABYLON.StandardMaterial("ground", scene);
 // ground.material.diffuseColor = BABYLON.Color3.FromInts(193, 181, 151);
 // ground.material.specularColor = BABYLON.Color3.Black();
+
 /***********************************************************/
 return scene;
 };
 
 
 var scene = createScene();
-	engine.runRenderLoop(function () {
+engine.runRenderLoop(function () {
 	scene.render();
 });
 
