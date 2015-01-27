@@ -3,6 +3,7 @@ var engine = new BABYLON.Engine(canvas, true);
 var scene;
 var camera;
 var light;
+var ground;
 
 var initScene = function ()
 {
@@ -13,7 +14,7 @@ var initScene = function ()
 
 var initCamera = function ()
 {
-	var camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(-20, 10, -30), scene);
+	var camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(-50, 50, -80), scene);
 	camera.setTarget(BABYLON.Vector3.Zero());
 	camera.attachControl(canvas, false);
 	return camera;
@@ -22,28 +23,42 @@ var initCamera = function ()
 var initLight = function ()
 {
 	var light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 1, 0), scene);
-	light.intensity = .5;
+	light.intensity = .7;
 	var d1 = new BABYLON.DirectionalLight("dir", new BABYLON.Vector3(1, -1, -2), scene);
 	d1.position = new BABYLON.Vector3(-300,300,600);
 	return light;
 };
 
-var createLane = function (id, position)
+
+var createMountain = function ( positions, vertexPoint, mapDiv )
 {
-	var lane = BABYLON.Mesh.CreateBox("lane"+id, 1, scene);
-	lane.scaling.y = 0.2;
-	lane.scaling.x = 1;
-	lane.scaling.z = 20;
+	for (var i = 0; i < positions.length; i+=3)
+	{
+	    if ( positions[i] == vertexPoint[0] && positions[i+2] == vertexPoint[2] )
+	    {
+			
+			for ( var deg = 0; deg < 360; deg+= 0.1 )
+			{
+				for (var dist = 0; dist < vertexPoint[1]; dist+= 0.1)
+				{			
+					var x = Math.round(dist * Math.cos(Math.PI * deg / 180));
+					var z = Math.round(dist * Math.sin(Math.PI * deg / 180));
+					
+					var tabIndex = i + x *(mapDiv+1)*3 + z*3 + 1;
 
-	lane.position.x = position;
-	lane.position.y = 8;
-	lane.rotation.x = Math.PI / -3;
-};
 
-Tree = function() {
-    // Call the super class BABYLON.Mesh
-    BABYLON.Mesh.call(this, "tree", scene);
-    // ...
+					var ymid = vertexPoint[1]/2;
+					var ampl = vertexPoint[1]/2;
+
+					var heigh = ymid + ampl * Math.cos( Math.PI / vertexPoint[1] * dist );
+
+					if (positions[tabIndex] < heigh) 
+						positions[tabIndex] =  heigh;
+				}
+			}
+	    }
+	}
+	return positions;
 };
 
 var createScene = function () 
@@ -58,78 +73,48 @@ light = initLight();
 //    var box = new BABYLON.Mesh(name, scene);
 //    var vertexData = BABYLON.VertexData.CreateBox(10);
 //    vertexData.applyToMesh(box, false);
-//    box.material = new BABYLON.StandardMaterial("ground", scene);
-//    box.material.diffuseColor = BABYLON.Color3.FromInts(193, 181, 151);
-//    box.material.specularColor = BABYLON.Color3.Black();
-//    box.scaling.y = 0.1;
-//    
-    var materialSphere1 = new BABYLON.StandardMaterial("texture1", scene);
-    materialSphere1.wireframe = true;
-//    box.material = materialSphere1;
-//    
-//    var positions = box.getVerticesData(BABYLON.VertexBuffer.PositionKind);
-//    console.log(positions);
-//    var indices = box.getIndices();
-//    var numberOfPoints = positions.length/3;
-//    var v3 = BABYLON.Vector3;
-//    var max = [];
-//    var i = 0;
-//    positions[i] += 20;
-//    positions[i+1] += 1;
-//    positions[i+2] += 25;
-//    
-//    box.setVerticesData(BABYLON.VertexBuffer.PositionKind, positions);
-//    var normals = [];
-//    BABYLON.VertexData.ComputeNormals(positions, indices, normals);
-//    box.setVerticesData(BABYLON.VertexBuffer.NormalKind, normals);
-//    console.log(positions);
-    
-        var pos = [0, 20, 0];
-    
-    var ground = BABYLON.Mesh.CreateGround("ground", 100, 100, 100, scene);
-    ground.material = materialSphere1;
-    
-    var positions = ground.getVerticesData("position");
-    var numberPoints = positions.length;
-    
-    for (var i = 0; i < numberPoints; i+=3)
-    {
-        if (positions[i] == pos[0] && positions[i+2] == pos[2] )
-        {
-			for (var y = 0; y < 20; y++)
-			{
-				
-				
-				
-				
-				
-				positions[i - y * 3 + 1] = 10 + 10 * Math.cos( Math.PI / pos[1] * y );
-				positions[i + y * 3 + 1] = 10 + 10 * Math.cos( Math.PI / pos[1] * y );
-				
-//				for(var j = 0; j < 20; j++)
-//				{
-//					var h = pos[1] - (y+j);
-//					if (h > 0)
-//					{
-//						positions[i - y * 3 + 1 + 101 *3 * (j+1)] = 10 + 10 * Math.cos( Math.PI / 20 * y );
-//						positions[i + y * 3 + 1 + 101 *3 * (j+1)] = 10 + 10 * Math.cos( Math.PI / 20 * y );
-//					}
-//				}
-			}
-        }
-    }
-    ground.setVerticesData(BABYLON.VertexBuffer.PositionKind, positions);
-    
-// scene.fogMode = BABYLON.Scene.FOGMODE_EXP2;
-// scene.fogDensity = 0.003;
-// scene.fogColor = new BABYLON.Color3(0.8,0.83,0.8);
+var colorMaterial = new BABYLON.StandardMaterial("ground", scene);
+colorMaterial.diffuseColor = BABYLON.Color3.FromInts(193, 181, 151);
+colorMaterial.specularColor = BABYLON.Color3.Black();
 
+var waterColor = new BABYLON.StandardMaterial("ground", scene);
+waterColor.diffuseColor = BABYLON.Color3.FromInts(70, 130, 180);
+waterColor.specularColor = BABYLON.Color3.Black();
+
+var wireMaterial = new BABYLON.StandardMaterial("texture1", scene);
+wireMaterial.wireframe = true;
+//    box.scaling.y = 0.1;
+// 
 // // Ground
 // var ground = BABYLON.Mesh.CreateGround("ground", 100, 100, 1, scene);
 // ground.material = new BABYLON.StandardMaterial("ground", scene);
 // ground.material.diffuseColor = BABYLON.Color3.FromInts(193, 181, 151);
 // ground.material.specularColor = BABYLON.Color3.Black();
 
+
+var mapSize = [100, 100, 100];
+var mountain1 = [10, 20, -10];
+var mountain2 = [20, 20, 0];
+
+ground = BABYLON.Mesh.CreateGround("ground", mapSize[0], mapSize[1], mapSize[2], scene);
+// ground.material = wireMaterial;
+ground.material = colorMaterial;
+    
+var positions = ground.getVerticesData("position");    
+positions = createMountain(positions, mountain1, mapSize[2]);
+
+
+
+positions = createMountain(positions, mountain2, mapSize[2]);
+ground.setVerticesData(BABYLON.VertexBuffer.PositionKind, positions);
+
+ground.convertToFlatShadedMesh();
+
+
+var water = BABYLON.Mesh.CreateGround("water", mapSize[0], mapSize[1], mapSize[2], scene);
+water.material = waterColor;
+
+water.position.y = 5;
 /***********************************************************/
 return scene;
 };
