@@ -32,6 +32,8 @@ var initLight = function ()
 
 var createMountain = function ( positions, vertexPoint, mapDiv )
 {
+	var coefWidth = 1;
+	var coefHeight = 0;
 	for (var i = 0; i < positions.length; i+=3)
 	{
 	    if ( positions[i] == vertexPoint[0] && positions[i+2] == vertexPoint[2] )
@@ -46,11 +48,10 @@ var createMountain = function ( positions, vertexPoint, mapDiv )
 					
 					var tabIndex = i + x *(mapDiv+1)*3 + z*3 + 1;
 
-
 					var ymid = vertexPoint[1]/2;
 					var ampl = vertexPoint[1]/2;
 
-					var heigh = ymid + ampl * Math.cos( Math.PI / vertexPoint[1] * dist );
+					var heigh = ymid+coefHeight + ampl*coefWidth * Math.cos( Math.PI / vertexPoint[1] * dist );
 
 					if (positions[tabIndex] < heigh) 
 						positions[tabIndex] =  heigh;
@@ -95,18 +96,17 @@ wireMaterial.wireframe = true;
 var mapSize = [100, 100, 100];
 var mountain1 = [10, 20, -10];
 var mountain2 = [20, 20, 0];
+var mountain3 = [20, 40, 0];
 
 ground = BABYLON.Mesh.CreateGround("ground", mapSize[0], mapSize[1], mapSize[2], scene);
 // ground.material = wireMaterial;
 ground.material = colorMaterial;
     
-var positions = ground.getVerticesData("position");    
+var positions = ground.getVerticesData("position");  
+
 positions = createMountain(positions, mountain1, mapSize[2]);
 
-
-
 positions = createMountain(positions, mountain2, mapSize[2]);
-ground.setVerticesData(BABYLON.VertexBuffer.PositionKind, positions);
 
 ground.convertToFlatShadedMesh();
 
@@ -114,7 +114,32 @@ ground.convertToFlatShadedMesh();
 var water = BABYLON.Mesh.CreateGround("water", mapSize[0], mapSize[1], mapSize[2], scene);
 water.material = waterColor;
 
-water.position.y = 5;
+water.position.y = -1;
+
+// var animationBox = new BABYLON.Animation("myAnimation", "position.y", 30, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
+// var keys = [];
+// //At the animation key 0, the value of scaling is "1"
+// keys.push({
+// 	frame: 0,
+// 	value: -5
+// });
+// //At the animation key 20, the value of scaling is "0.2"
+// keys.push({
+// 	frame: 400,
+// 	value: 15
+// });
+// animationBox.setKeys(keys);
+// //Then add the animation object to box1
+// water.animations.push(animationBox);
+// //Finally, launch animations on box1, from key 0 to key 100 with loop activated
+// scene.beginAnimation(water, 0, 2000, false);
+
+setInterval(function () 
+{
+	water.position.y += 0.02;
+
+}, 1000/10);
+
 /***********************************************************/
 return scene;
 };
