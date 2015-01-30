@@ -153,7 +153,31 @@ var animate = setInterval(function ()
 	if (water.position.y > 3)
 		clearInterval(animate);
 
-}, 1000/10);
+}, 1000/10);*/
+
+var fountain = BABYLON.Mesh.CreateBox("foutain", 1.0, scene);
+fountain.position.x = -45;
+fountain.position.y = 8;
+
+var particleSystem = new BABYLON.ParticleSystem("particles", 2000, scene);
+particleSystem.particleTexture = new BABYLON.Texture("textures/flares.png", scene);
+particleSystem.emitter = fountain; 
+particleSystem.emitRate = 1000;
+
+particleSystem.gravity = new BABYLON.Vector3(0, -9.81, 0);
+
+particleSystem.start();
+
+particleSystem.updateFunction = function ( particles )
+{
+		for ( var i = 0; i < particles.length; i++ )
+		{
+			// Update pos
+			var particle = particles[i];
+			particle.direction.y += 0.005; // gravity
+			particle.position = particle.position.add( particle.direction );
+		}
+};
 
 /***********************************************************/
 return scene;
