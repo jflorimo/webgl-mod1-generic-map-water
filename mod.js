@@ -71,7 +71,7 @@ light = initLight();
 
 BABYLON.Engine.ShadersRepository = "shaders/";
 
-var skybox = BABYLON.Mesh.CreateSphere("skyBox", 10, 250, scene);
+var skybox = BABYLON.Mesh.CreateSphere("skyBox", 10, 500, scene);
 
 var shader = new BABYLON.ShaderMaterial("gradient", scene, "gradient", {});
 shader.setFloat("offset", 0);
@@ -80,6 +80,8 @@ shader.setColor3("topColor", BABYLON.Color3.FromInts(0,119,255));
 shader.setColor3("bottomColor", BABYLON.Color3.FromInts(240,240, 255));
 shader.backFaceCulling = false;
 skybox.material = shader;
+
+skybox.position.y = -80;
 /***********************************************************/
 // Fog
 //    var box = new BABYLON.Mesh(name, scene);
@@ -145,9 +147,11 @@ water.position.y = -1;
 // //Finally, launch animations on box1, from key 0 to key 100 with loop activated
 // scene.beginAnimation(water, 0, 2000, false);
 
-setInterval(function () 
+var animate = setInterval(function () 
 {
 	water.position.y += 0.02;
+	if (water.position.y > 3)
+		clearInterval(animate);
 
 }, 1000/10);
 
