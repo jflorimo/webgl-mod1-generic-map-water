@@ -162,7 +162,7 @@ fountain.position.y = 8;
 var particleSystem = new BABYLON.ParticleSystem("particles", 1000, scene);
 particleSystem.particleTexture = new BABYLON.Texture("textures/flares.png", scene);
 particleSystem.emitter = fountain; 
-particleSystem.emitRate = 100;
+particleSystem.emitRate = 50;
 
 // particleSystem.gravity = new BABYLON.Vector3(0, -9.81, 0);
 particleSystem.minEmitPower = 0.1;
@@ -223,12 +223,28 @@ particleSystem.updateFunction = function ( particles )
 				particle.direction.z *= -1;
 			}
 
-			
 
-			// for (int j = 0; j < particles.length; j++ )
-			// {
-			// 	if (particle.position)
-			// }
+
+			for (var j = 0; j < particles.length; j++ )
+			{
+				if (j != i)
+				{
+					var particle2 = particles[j];
+					var distVec = particle2.position.subtract( particle.position );
+					var dist = distVec.length();
+					if (dist <= particlesSize)
+					{
+						var coeff = particlesSize / dist;
+
+						// particle.position.x += particle.direction.x / -coeff;
+						// particle.position.z += particle.direction.z / -coeff;
+
+						// particle2.position.x += -particle.direction.x / -coeff;
+						// particle2.position.z += -particle.direction.z / -coeff;
+					}
+
+				}	
+			}
 		}
 };
 
