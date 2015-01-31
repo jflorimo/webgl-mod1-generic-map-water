@@ -159,7 +159,7 @@ var fountain = BABYLON.Mesh.CreateBox("foutain", 1.0, scene);
 fountain.position.x = -45;
 fountain.position.y = 8;
 
-var particleSystem = new BABYLON.ParticleSystem("particles", 2000, scene);
+var particleSystem = new BABYLON.ParticleSystem("particles", 1000, scene);
 particleSystem.particleTexture = new BABYLON.Texture("textures/flares.png", scene);
 particleSystem.emitter = fountain; 
 particleSystem.emitRate = 100;
@@ -167,6 +167,13 @@ particleSystem.emitRate = 100;
 // particleSystem.gravity = new BABYLON.Vector3(0, -9.81, 0);
 particleSystem.minEmitPower = 0.1;
 particleSystem.maxEmitPower = 0.1;
+
+var particlesSize = 1;
+particleSystem.minSize = particlesSize;
+particleSystem.maxSize = particlesSize;
+
+particleSystem.direction1 = new BABYLON.Vector3(3, 0, 3);
+
 particleSystem.start();
 
 particleSystem.updateFunction = function ( particles )
@@ -175,8 +182,53 @@ particleSystem.updateFunction = function ( particles )
 		{
 			// Update pos
 			var particle = particles[i];
-			particle.direction.y -= 0.005; // gravity
-			particle.position = particle.position.add( particle.direction );
+			if ( particle.position.y + particlesSize >= ground.position.y )
+			{
+				particle.direction.y -= 0.005; // gravity
+				particle.position = particle.position.add( particle.direction );
+			}
+		}
+		for ( var i = 0; i < particles.length; i++ )
+		{
+			var particle = particles[i];
+
+			if ( particle.position.y - particlesSize <= ground.position.y )
+			{
+				particle.position.y = ground.position.y + particlesSize;
+				particle.direction.x *= 0.999;
+				particle.direction.z *= 0.999;
+			}
+
+			if( particle.position.x + particlesSize >= 50 )
+			{
+				// particle.position.x = 50;
+				particle.direction.x *= -1;
+			}
+
+			if( particle.position.x + particlesSize <= -50 )
+			{
+				// particle.position.x = -50;
+				particle.direction.x *= -1;
+			}
+
+			if( particle.position.z + particlesSize >= 50 )
+			{
+				// particle.position.z = 50;
+				particle.direction.z *= -1;
+			}
+
+			if( particle.position.z + particlesSize <= -50 )
+			{
+				// particle.position.z = -50;
+				particle.direction.z *= -1;
+			}
+
+			
+
+			// for (int j = 0; j < particles.length; j++ )
+			// {
+			// 	if (particle.position)
+			// }
 		}
 };
 
