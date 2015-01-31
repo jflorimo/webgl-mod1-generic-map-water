@@ -159,7 +159,7 @@ var fountain = BABYLON.Mesh.CreateBox("foutain", 1.0, scene);
 fountain.position.x = -45;
 fountain.position.y = 8;
 
-var particleSystem = new BABYLON.ParticleSystem("particles", 1000, scene);
+var particleSystem = new BABYLON.ParticleSystem("particles", 800, scene);
 particleSystem.particleTexture = new BABYLON.Texture("textures/flares.png", scene);
 particleSystem.emitter = fountain; 
 particleSystem.emitRate = 50;
@@ -196,6 +196,7 @@ particleSystem.updateFunction = function ( particles )
 			{
 				particle.position.y = ground.position.y + particlesSize;
 				particle.direction.x *= 0.999;
+				particle.direction.y *= -1;
 				particle.direction.z *= 0.999;
 			}
 
