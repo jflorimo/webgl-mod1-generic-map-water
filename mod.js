@@ -14,7 +14,7 @@ var initScene = function ()
 
 var initCamera = function ()
 {
-	var camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(-50, 50, -80), scene);
+	var camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(-80, 50, -80), scene);
 	camera.setTarget(BABYLON.Vector3.Zero());
 	camera.attachControl(canvas, false);
 	return camera;
@@ -147,13 +147,13 @@ water.position.y = -1;
 // //Finally, launch animations on box1, from key 0 to key 100 with loop activated
 // scene.beginAnimation(water, 0, 2000, false);
 
-var animate = setInterval(function () 
-{
-	water.position.y += 0.02;
-	if (water.position.y > 3)
-		clearInterval(animate);
+// var animate = setInterval(function () 
+// {
+// 	water.position.y += 0.02;
+// 	if (water.position.y > 3)
+// 		clearInterval(animate);
 
-}, 1000/10);*/
+// }, 1000/10);*/
 
 var fountain = BABYLON.Mesh.CreateBox("foutain", 1.0, scene);
 fountain.position.x = -45;
@@ -162,10 +162,11 @@ fountain.position.y = 8;
 var particleSystem = new BABYLON.ParticleSystem("particles", 2000, scene);
 particleSystem.particleTexture = new BABYLON.Texture("textures/flares.png", scene);
 particleSystem.emitter = fountain; 
-particleSystem.emitRate = 1000;
+particleSystem.emitRate = 100;
 
-particleSystem.gravity = new BABYLON.Vector3(0, -9.81, 0);
-
+// particleSystem.gravity = new BABYLON.Vector3(0, -9.81, 0);
+particleSystem.minEmitPower = 0.1;
+particleSystem.maxEmitPower = 0.1;
 particleSystem.start();
 
 particleSystem.updateFunction = function ( particles )
@@ -174,7 +175,7 @@ particleSystem.updateFunction = function ( particles )
 		{
 			// Update pos
 			var particle = particles[i];
-			particle.direction.y += 0.005; // gravity
+			particle.direction.y -= 0.005; // gravity
 			particle.position = particle.position.add( particle.direction );
 		}
 };
