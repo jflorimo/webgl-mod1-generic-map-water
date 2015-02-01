@@ -183,14 +183,20 @@ particleSystem.start();
 
 particleSystem.updateFunction = function ( particles )
 {
+
 		for ( var i = 0; i < particles.length; i++ )
 		{
 			// Update pos
 			var particle = particles[i];
 			if ( particle.position.y + particlesSize >= ground.position.y )
 			{
-				particle.direction.y -= 0.005; // gravity
+				//particle.direction.y -= 0.005; // gravity
+				//particle.position = particle.position.add( particle.direction );
+
+				
+				particle.direction.y -= 0.005/2; // gravity
 				particle.position = particle.position.add( particle.direction );
+				particle.direction.y -= 0.005/2; // gravity
 			}
 		}
 		for ( var i = 0; i < particles.length; i++ )
@@ -200,34 +206,11 @@ particleSystem.updateFunction = function ( particles )
 			if ( particle.position.y - particlesSize <= ground.position.y )
 			{
 				particle.position.y = ground.position.y + particlesSize;
-				particle.direction.x *= 0.999;
+				//particle.direction.x *= 0.999;
 				//particle.direction.y *= -1;
-				particle.direction.z *= 0.999;
+				//particle.direction.z *= 0.999;
 			}
 
-			if( particle.position.x + particlesSize >= -30 )//50
-			{
-				// particle.position.x = 50;
-				particle.direction.x *= -1;
-			}
-
-			if( particle.position.x + particlesSize <= -50 )
-			{
-				// particle.position.x = -50;
-				particle.direction.x *= -1;
-			}
-
-			if( particle.position.z + particlesSize >= 0 )//50
-			{
-				// particle.position.z = 50;
-				particle.direction.z *= -1;
-			}
-
-			if( particle.position.z + particlesSize <= -5 )//-50
-			{
-				// particle.position.z = -50;
-				particle.direction.z *= -1;
-			}
 			
 			for (var j = i + 1; j < particles.length; j++)  
 			{  
@@ -256,11 +239,12 @@ particleSystem.updateFunction = function ( particles )
 					//particle.position = particle.position.addInPlace(mtd.multiply(im1 / (im1 + im2)));
 					//ball.position = ball.position.subtract(mtd.multiply(im2 / (im1 + im2)));
 					//particle2.position = particle2.position.subtract(mtd.multiply(im2 / (im1 + im2)));
-					
+			
 					var tmp1 = im1 / ( im1 + im2 );
 					particle.position.addInPlace( mtd.multiplyByFloats( tmp1, tmp1, tmp1 ) );
 					var tmp2 = im2 / ( im1 + im2 );
 					particle2.position.subtractInPlace( mtd.multiplyByFloats( tmp2, tmp2, tmp2 ) );
+				
 
 					// impact speed
 					// Vector2d v = (this.velocity.subtract(ball.velocity));
@@ -281,16 +265,43 @@ particleSystem.updateFunction = function ( particles )
 					
 					if (vn < 0.0)
 					{
-					var reduction = 0.1;
-					var i_ = ( -( 1.0 + reduction ) * vn ) / ( im1 + im2 );
-					var impulse = mtd.normalize().multiplyByFloats( i_, i_, i_ );
-					//var i = (-( 1.0 + 0.5 ) * vn ) / ( im1 + im2 );
-					//var impulse = mtd.normalize().multiply( i, i, i );
+						var reduction = 0.1;
+						var i_ = ( -( 1.0 + reduction ) * vn ) / ( im1 + im2 );
+						var impulse = mtd.normalize().multiplyByFloats( i_, i_, i_ );
+						//var i = (-( 1.0 + 0.5 ) * vn ) / ( im1 + im2 );
+						//var impulse = mtd.normalize().multiply( i, i, i );
 
-					particle.direction.addInPlace( impulse.multiplyByFloats( im1, im1, im1 ) );
-					particle2.direction.subtractInPlace( impulse.multiplyByFloats( im2, im2, im2 ) );
+						particle.direction.addInPlace( impulse.multiplyByFloats( im1, im1, im1 ) );
+						particle2.direction.subtractInPlace( impulse.multiplyByFloats( im2, im2, im2 ) );
 					}
 				}
+			}
+			var right = -40;
+			if( particle.position.x + particlesSize >= right )//50
+			{
+				//particle.position.x = right;
+				particle.direction.x *= -1;
+			}
+
+			var up = 10;
+			if( particle.position.z + particlesSize >= up )//50
+			{
+				//particle.position.z = up;
+				particle.direction.z *= -1;
+			}
+			var down = -5;
+			if( particle.position.z + particlesSize <= down )//-50
+			{
+				particle.position.y += 0.5;
+				particle.position.z = down - particlesSize;
+				particle.direction.z *= -1;
+			}
+			var left = -50;
+			if( particle.position.x + particlesSize <= left )
+			{
+				particle.position.y += 0.5;
+				particle.position.x = left - particlesSize;
+				particle.direction.x *= -1;
 			}
 			
 		}
