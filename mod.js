@@ -5,7 +5,7 @@ var camera;
 var light;
 var ground;
 
-var particlesSize = 1;
+var particlesSize = 1.8;
 var radius = particlesSize/2;
 
 var initScene = function ()
@@ -187,6 +187,10 @@ particleSystem.maxAngularSpeed = 2;
 
 particleSystem.start();
 
+//limits = [right, left, up, down]
+var limits = [-30, -50, 10, -10];
+var gravity = 0.038;
+
 particleSystem.updateFunction = function ( particles )
 {
 		for ( var i = 0; i < particles.length; i++ )
@@ -194,33 +198,33 @@ particleSystem.updateFunction = function ( particles )
 			var particle1 = particles[i];
 			if ( particle1.position.y + radius >= ground.position.y )
 			{
-				//particle1.direction.y -= 0.0005/2; // gravity
+				particle1.direction.y -= gravity/2; // gravity
 				particle1.position = particle1.position.add( particle1.direction );
-				particle1.direction.y = -0.005/2; // gravity
+				particle1.direction.y = -gravity/2; // gravity
 			}
 			if ( particle1.position.y - radius <= ground.position.y )
 			{
 				particle1.position.y = ground.position.y + radius;
 			}
-			var right = -30;
+			var right = limits[0];
 			if( particle1.position.x + radius >= right )//50
 			{
 				particle1.position.x = right - radius;
 				particle1.direction.x *= -1;
 			}
-			var up = 30;
+			var up = limits[2];
 			if( particle1.position.z + radius >= up )//50
 			{
 				particle1.position.z = up - radius;
 				particle1.direction.z *= -1;
 			}
-			var down = -10;
+			var down = limits[3];
 			if( particle1.position.z - radius <= down )//-50
 			{
 				particle1.position.z = down + radius;
 				particle1.direction.z *= -1;
 			}
-			var left = -50;
+			var left = limits[1];
 			if( particle1.position.x - radius <= left )//-50
 			{
 				particle1.position.x = left + radius;
@@ -250,7 +254,7 @@ particleSystem.updateFunction = function ( particles )
 					
 					if (vn < 0.0)
 					{
-						var reduction = 0.1;
+						var reduction = 0.5;
 						var i_ = ( -( 1.0 + reduction ) * vn ) / ( im1 + im2 );
 						var impulse = mtd.normalize().multiplyByFloats( i_, i_, i_ );
 
@@ -259,9 +263,14 @@ particleSystem.updateFunction = function ( particles )
 					}
 				}
 			}
-
+			// if ( particle1.position.y + radius >= ground.position.y )
+			// {
+			// 	particle1.direction.y = -gravity/2; // gravity
+			// 	particle1.position = particle1.position.add( particle1.direction );
+			// 	particle1.direction.y -= -gravity/2; // gravity
+			// }
 		}
-		
+
 };
 
 /***********************************************************/
