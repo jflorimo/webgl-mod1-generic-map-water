@@ -5,6 +5,9 @@ var camera;
 var light;
 var ground;
 
+var particlesSize = 1;
+var radius = particlesSize/2;
+
 var initScene = function ()
 {
 	var scene = new BABYLON.Scene(engine);
@@ -157,7 +160,7 @@ water.position.y = -1;
 
 var fountain = BABYLON.Mesh.CreateBox("foutain", 1.0, scene);
 fountain.position.x = -45;
-fountain.position.y = 20;
+fountain.position.y = 1;
 
 var particleSystem = new BABYLON.ParticleSystem("particles", 2000, scene);
 particleSystem.particleTexture = new BABYLON.Texture("textures/flares.png", scene);
@@ -166,19 +169,21 @@ particleSystem.minEmitBox = new BABYLON.Vector3(-1, 0, 0); // Starting all from
 particleSystem.maxEmitBox = new BABYLON.Vector3(1, 0, 0);
 particleSystem.emitRate = 200;
 
-// particleSystem.gravity = new BABYLON.Vector3(0, -9.81, 0);
+
 particleSystem.minEmitPower = 0.1;
 particleSystem.maxEmitPower = 0.1;
 
-var particlesSize = 1;
-var radius = particlesSize/2;
 particleSystem.minSize = particlesSize;
 particleSystem.maxSize = particlesSize;
 
 particleSystem.color1 = new BABYLON.Color4(0, 0.5, 1, 1);
 particleSystem.color2 = new BABYLON.Color4(0, 0.2, 0.5, 1);
 
-particleSystem.direction1 = new BABYLON.Vector3(3, 0, 3);
+particleSystem.direction1 = new BABYLON.Vector3(3, -3, 3);
+particleSystem.direction2 = new BABYLON.Vector3(3, -1, 6);
+
+particleSystem.gravity = new BABYLON.Vector3(-1, 0, 0);
+particleSystem.maxAngularSpeed = 2;
 
 particleSystem.start();
 
@@ -189,49 +194,49 @@ particleSystem.updateFunction = function ( particles )
 			var particle1 = particles[i];
 			if ( particle1.position.y + radius >= ground.position.y )
 			{
-				particle1.direction.y -= 0.005/2; // gravity
+				//particle1.direction.y -= 0.0005/2; // gravity
 				particle1.position = particle1.position.add( particle1.direction );
-				particle1.direction.y -= 0.005/2; // gravity
+				particle1.direction.y = -0.005/2; // gravity
 			}
 			if ( particle1.position.y - radius <= ground.position.y )
 			{
 				particle1.position.y = ground.position.y + radius;
 			}
-			var right = -40;
+			var right = -30;
 			if( particle1.position.x + radius >= right )//50
 			{
+				particle1.position.x = right - radius;
 				particle1.direction.x *= -1;
 			}
-			var up = 10;
+			var up = 30;
 			if( particle1.position.z + radius >= up )//50
 			{
+				particle1.position.z = up - radius;
 				particle1.direction.z *= -1;
 			}
-			var down = -5;
+			var down = -10;
 			if( particle1.position.z - radius <= down )//-50
 			{
+				particle1.position.z = down + radius;
 				particle1.direction.z *= -1;
 			}
 			var left = -50;
 			if( particle1.position.x - radius <= left )//-50
 			{
+				particle1.position.x = left + radius;
 				particle1.direction.x *= -1;
 			}
 			for (var j = i + 1; j < particles.length; j++)
 			{
 				var particle2 = particles[j];
-				// console.log("fs");
-				if (detectCollision(particle1, particle2))
+				if (detectSphereCollision(particle1, particle2))
 				{
 					var delta = particle1.position.subtract(particle2.position);
 					var d = delta.length();
-					// minimum translation distance to push balls apart after intersecting
-					// Vector2d mtd = delta.multiply(((getRadius() + ball.getRadius())-d)/d); 
-					var tmp = ( (1) -d ) / d;
+
+					var tmp = ( (particlesSize) -d ) / d;
 					var mtd = delta.multiplyByFloats( tmp, tmp, tmp );
 
-					// resolve intersection --
-					// inverse mass quantities
 					var im1 = 1 / 5; 
 					var im2 = 1 / 5;
 			
@@ -242,25 +247,12 @@ particleSystem.updateFunction = function ( particles )
 				
 					var v = particle1.direction.subtract( particle2.direction );
 					var vn = BABYLON.Vector3.Dot( v, mtd.normalize() );
-
-					// sphere intersecting but moving away from each other already
-					// if (vn > 0.0f) return;
-
-					// collision impulse
-					// float i = (-(1.0f + Constants.restitution) * vn) / (im1 + im2);
-					//Vector2d impulse = mtd.multiply(i);
-
-					// change in momentum
-					//this.velocity = this.velocity.add(impulse.multiply(im1));
-					//ball.velocity = ball.velocity.subtract(impulse.multiply(im2));
 					
 					if (vn < 0.0)
 					{
 						var reduction = 0.1;
 						var i_ = ( -( 1.0 + reduction ) * vn ) / ( im1 + im2 );
 						var impulse = mtd.normalize().multiplyByFloats( i_, i_, i_ );
-						//var i = (-( 1.0 + 0.5 ) * vn ) / ( im1 + im2 );
-						//var impulse = mtd.normalize().multiply( i, i, i );
 
 						particle1.direction.addInPlace( impulse.multiplyByFloats( im1, im1, im1 ) );
 						particle2.direction.subtractInPlace( impulse.multiplyByFloats( im2, im2, im2 ) );
@@ -281,13 +273,18 @@ var resolveCollision = function(part1, part2)
 
 };
 
-var detectCollision = function(elem1, elem2)
+var resolveEnvCollision = function(part1, part2)
+{
+
+};
+
+var detectSphereCollision = function(elem1, elem2)
 {
 	var xd = elem1.position.x - elem2.position.x;
 	var yd = elem1.position.y - elem2.position.y;
 	var zd = elem1.position.z - elem2.position.z;
 
-	var sumRadius = 1;
+	var sumRadius = particlesSize;
 	var sqrRadius = sumRadius * sumRadius;
 
 	var distSqr = (xd * xd) + (yd * yd) + (zd * zd);
