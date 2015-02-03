@@ -182,6 +182,8 @@ particleSystem.color2 = new BABYLON.Color4(0, 0.2, 0.5, 1);
 particleSystem.direction1 = new BABYLON.Vector3(3, -3, 3);
 particleSystem.direction2 = new BABYLON.Vector3(3, -1, 6);
 
+// particleSystem.blendMode = BABYLON.ParticleSystem.BLEND_MODE_ONEONE;
+
 particleSystem.gravity = new BABYLON.Vector3(-1, 0, 0);
 particleSystem.maxAngularSpeed = 2;
 
