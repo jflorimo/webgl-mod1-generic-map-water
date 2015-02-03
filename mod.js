@@ -5,7 +5,7 @@ var camera;
 var light;
 var ground;
 
-var particlesSize = 1.8;
+var particlesSize = 3.5;
 var radius = particlesSize/2;
 
 var initScene = function ()
@@ -162,7 +162,7 @@ var fountain = BABYLON.Mesh.CreateBox("foutain", 1.0, scene);
 fountain.position.x = -45;
 fountain.position.y = 1;
 
-var particleSystem = new BABYLON.ParticleSystem("particles", 2000, scene);
+var particleSystem = new BABYLON.ParticleSystem("particles", 2500, scene);
 particleSystem.particleTexture = new BABYLON.Texture("textures/flares.png", scene);
 particleSystem.emitter = fountain; 
 particleSystem.minEmitBox = new BABYLON.Vector3(-1, 0, 0); // Starting all from
@@ -188,7 +188,8 @@ particleSystem.maxAngularSpeed = 2;
 particleSystem.start();
 
 //limits = [right, left, up, down]
-var limits = [-30, -50, 10, -10];
+// var limits = [-30, -50, 10, -10];
+var limits = [50, -50, 50, -50];
 var gravity = 0.038;
 
 particleSystem.updateFunction = function ( particles )
@@ -201,34 +202,6 @@ particleSystem.updateFunction = function ( particles )
 				particle1.direction.y -= gravity/2; // gravity
 				particle1.position = particle1.position.add( particle1.direction );
 				particle1.direction.y = -gravity/2; // gravity
-			}
-			if ( particle1.position.y - radius <= ground.position.y )
-			{
-				particle1.position.y = ground.position.y + radius;
-			}
-			var right = limits[0];
-			if( particle1.position.x + radius >= right )//50
-			{
-				particle1.position.x = right - radius;
-				particle1.direction.x *= -1;
-			}
-			var up = limits[2];
-			if( particle1.position.z + radius >= up )//50
-			{
-				particle1.position.z = up - radius;
-				particle1.direction.z *= -1;
-			}
-			var down = limits[3];
-			if( particle1.position.z - radius <= down )//-50
-			{
-				particle1.position.z = down + radius;
-				particle1.direction.z *= -1;
-			}
-			var left = limits[1];
-			if( particle1.position.x - radius <= left )//-50
-			{
-				particle1.position.x = left + radius;
-				particle1.direction.x *= -1;
 			}
 			for (var j = i + 1; j < particles.length; j++)
 			{
@@ -261,6 +234,8 @@ particleSystem.updateFunction = function ( particles )
 						particle1.direction.addInPlace( impulse.multiplyByFloats( im1, im1, im1 ) );
 						particle2.direction.subtractInPlace( impulse.multiplyByFloats( im2, im2, im2 ) );
 					}
+					// particle1.direction.multiplyByFloats(0.001, 0.001, 0.001);
+					// particle2.direction.multiplyByFloats(0.001, 0.001, 0.001);
 				}
 			}
 			// if ( particle1.position.y + radius >= ground.position.y )
@@ -270,6 +245,42 @@ particleSystem.updateFunction = function ( particles )
 			// 	particle1.direction.y -= -gravity/2; // gravity
 			// }
 		}
+		for ( var i = 0; i < particles.length; i++ )
+		{
+			var particle1 = particles[i];
+
+			if ( particle1.position.y - radius <= ground.position.y )
+			{
+				particle1.position.y = ground.position.y + radius;
+				// particle1.direction.multiplyByFloats(0, 0, 0);
+			}
+			var right = limits[0];
+			if( particle1.position.x + radius >= right )//50
+			{
+				particle1.position.x = right - radius;
+				particle1.direction.x *= -0.8;
+			}
+			var up = limits[2];
+			if( particle1.position.z + radius >= up )//50
+			{
+				particle1.position.z = up - radius;
+				particle1.direction.z *= -0.8;
+			}
+			var down = limits[3];
+			if( particle1.position.z - radius <= down )//-50
+			{
+				particle1.position.z = down + radius;
+				particle1.direction.z *= -0.8;
+			}
+			var left = limits[1];
+			if( particle1.position.x - radius <= left )//-50
+			{
+				particle1.position.x = left + radius;
+				particle1.direction.x *= -0.8;
+			}
+			// particle1.direction.multiplyByFloats(0.001, 0.001, 0.001);
+		}
+
 
 };
 
