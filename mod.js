@@ -162,7 +162,7 @@ var fountain = BABYLON.Mesh.CreateBox("foutain", 1.0, scene);
 fountain.position.x = -45;
 fountain.position.y = 1;
 
-var particleSystem = new BABYLON.ParticleSystem("particles", 2500, scene);
+var particleSystem = new BABYLON.ParticleSystem("particles", 2000, scene);
 particleSystem.particleTexture = new BABYLON.Texture("textures/flares.png", scene);
 particleSystem.emitter = fountain; 
 particleSystem.minEmitBox = new BABYLON.Vector3(-1, 0, 0); // Starting all from
@@ -184,7 +184,7 @@ particleSystem.direction2 = new BABYLON.Vector3(3, -1, 6);
 
 // particleSystem.blendMode = BABYLON.ParticleSystem.BLEND_MODE_ONEONE;
 
-particleSystem.gravity = new BABYLON.Vector3(-1, 0, 0);
+particleSystem.gravity = new BABYLON.Vector3(0, -0.3, 0);
 particleSystem.maxAngularSpeed = 2;
 
 particleSystem.start();
@@ -204,6 +204,11 @@ particleSystem.updateFunction = function ( particles )
 				particle1.direction.y -= gravity/2; // gravity
 				particle1.position = particle1.position.add( particle1.direction );
 				particle1.direction.y = -gravity/2; // gravity
+				// particle1.direction.scaleToRef(this._scaledUpdateSpeed, this._scaledDirection);
+				// particle1.position.addInPlace(this._scaledDirection);
+
+				// this.gravity.scaleToRef(this._scaledUpdateSpeed, this._scaledGravity);
+				// particle1.direction.addInPlace(this._scaledGravity);
 			}
 			for (var j = i + 1; j < particles.length; j++)
 			{
@@ -290,14 +295,36 @@ particleSystem.updateFunction = function ( particles )
 return scene;
 };
 
-var resolveCollision = function(part1, part2)
-{
+var altitude = [];
 
+var CreateArrayOfAltitude = function( positions )
+{
+	for ( var i = 0; i < mapSize[2] ; i++ )
+	{
+		altitude[mapSize[2] - i - 50] = [];
+		for ( var j = 0; j < mapSize[2]; j++ )
+		{
+			altitude[mapSize[2] - i - 50][j - 50] = positions[ getCustomIndex( i, j ) ];
+		};
+	};
 };
 
-var resolveEnvCollision = function(part1, part2)
+var getCustomIndex = function( x, y )
 {
+		return ( ( x * (mapSize[2] + 1) + y ) * 3 + 1 );
+};
 
+var getAltitude = function( x, y )
+{
+	if ( (Math.round(y) >= altitude.length || Math.round(y) < -50 ) )
+		return 0;
+	console.log(Math.round( y ));
+	var alt =  altitude[Math.round( y )][Math.round( x )] + ground.position.y; 
+
+	if (alt)
+		return alt;
+	else
+		return 0;
 };
 
 var detectSphereCollision = function(elem1, elem2)
