@@ -141,11 +141,16 @@ water.position.y = -1;
 
 CreateArrayOfAltitude(positions);
 
+
+// Effect
+var effect = engine.createEffectForParticles("particle", ["time"]);
+
+
 var fountain = BABYLON.Mesh.CreateBox("foutain", 1.0, scene);
 fountain.position.x = 0;
 fountain.position.y = 100;
 
-var particleSystem = new BABYLON.ParticleSystem("particles", 3000, scene);
+var particleSystem = new BABYLON.ParticleSystem("particles", 3000, scene, effect);
 particleSystem.particleTexture = new BABYLON.Texture("textures/flares.png", scene);
 particleSystem.emitter = fountain; 
 particleSystem.minEmitBox = new BABYLON.Vector3(-1, 0, 0); // Starting all from
@@ -297,7 +302,23 @@ particleSystem.updateFunction = function ( particles )
 			// particle1.direction.multiplyByFloats(0.001, 0.001, 0.001);
 		}
 
+	// var time = 0;
+ //    var order = 0.1;
 
+ //    scene.registerBeforeRender(function () {
+ //        // Waiting for effect to be compiled
+ //        if (!effect) {
+ //            return;
+ //        }
+
+ //        effect.setFloat("time", time);
+
+ //        time += order;
+
+ //        if (time > 100 || time < 0) {
+ //            order *= -1;
+ //        }
+ //    });
 };
 
 /***********************************************************/
