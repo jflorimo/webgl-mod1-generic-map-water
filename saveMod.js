@@ -121,6 +121,8 @@ positions = createMountain(positions, mountain1, mapSize[2]);
 
 positions = createMountain(positions, mountain2, mapSize[2]);
 
+ground.setVerticesData(BABYLON.VertexBuffer.PositionKind, positions);
+ 
 ground.convertToFlatShadedMesh();
 
 

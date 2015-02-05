@@ -7,6 +7,8 @@ var ground;
 
 var particlesSize = 3.5;
 var radius = particlesSize/2;
+var altitude = [];
+var mapDiv;
 
 var initScene = function ()
 {
@@ -126,43 +128,24 @@ positions = createMountain(positions, mountain2, mapSize[2]);
 
 ground.convertToFlatShadedMesh();
 
+mapDiv = mapSize[2];
+
+
 
 var water = BABYLON.Mesh.CreateGround("water", mapSize[0], mapSize[1], mapSize[2], scene);
 water.material = waterColor;
+//water.material = 
 
 water.position.y = -1;
 
-// var animationBox = new BABYLON.Animation("myAnimation", "position.y", 30, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
-// var keys = [];
-// //At the animation key 0, the value of scaling is "1"
-// keys.push({
-// 	frame: 0,
-// 	value: -5
-// });
-// //At the animation key 20, the value of scaling is "0.2"
-// keys.push({
-// 	frame: 400,
-// 	value: 15
-// });
-// animationBox.setKeys(keys);
-// //Then add the animation object to box1
-// water.animations.push(animationBox);
-// //Finally, launch animations on box1, from key 0 to key 100 with loop activated
-// scene.beginAnimation(water, 0, 2000, false);
 
-// var animate = setInterval(function () 
-// {
-// 	water.position.y += 0.02;
-// 	if (water.position.y > 3)
-// 		clearInterval(animate);
-
-// }, 1000/10);*/
+CreateArrayOfAltitude(positions);
 
 var fountain = BABYLON.Mesh.CreateBox("foutain", 1.0, scene);
-fountain.position.x = -45;
-fountain.position.y = 1;
+fountain.position.x = 0;
+fountain.position.y = 100;
 
-var particleSystem = new BABYLON.ParticleSystem("particles", 2000, scene);
+var particleSystem = new BABYLON.ParticleSystem("particles", 3000, scene);
 particleSystem.particleTexture = new BABYLON.Texture("textures/flares.png", scene);
 particleSystem.emitter = fountain; 
 particleSystem.minEmitBox = new BABYLON.Vector3(-1, 0, 0); // Starting all from
@@ -170,8 +153,8 @@ particleSystem.maxEmitBox = new BABYLON.Vector3(1, 0, 0);
 particleSystem.emitRate = 200;
 
 
-particleSystem.minEmitPower = 0.1;
-particleSystem.maxEmitPower = 0.1;
+particleSystem.minEmitPower = 0.01;
+particleSystem.maxEmitPower = 0.01;
 
 particleSystem.minSize = particlesSize;
 particleSystem.maxSize = particlesSize;
@@ -179,12 +162,12 @@ particleSystem.maxSize = particlesSize;
 particleSystem.color1 = new BABYLON.Color4(0, 0.5, 1, 1);
 particleSystem.color2 = new BABYLON.Color4(0, 0.2, 0.5, 1);
 
-particleSystem.direction1 = new BABYLON.Vector3(3, -3, 3);
-particleSystem.direction2 = new BABYLON.Vector3(3, -1, 6);
+particleSystem.direction1 = new BABYLON.Vector3(0, -5, 0);
+particleSystem.direction2 = new BABYLON.Vector3(0.5, -5, 0.5);
 
 // particleSystem.blendMode = BABYLON.ParticleSystem.BLEND_MODE_ONEONE;
 
-particleSystem.gravity = new BABYLON.Vector3(0, -0.3, 0);
+particleSystem.gravity = new BABYLON.Vector3(0, -1, 0);
 particleSystem.maxAngularSpeed = 2;
 
 particleSystem.start();
@@ -192,7 +175,7 @@ particleSystem.start();
 //limits = [right, left, up, down]
 // var limits = [-30, -50, 10, -10];
 var limits = [50, -50, 50, -50];
-var gravity = 0.038;
+var gravity = 0.38;
 
 particleSystem.updateFunction = function ( particles )
 {
@@ -255,10 +238,11 @@ particleSystem.updateFunction = function ( particles )
 		for ( var i = 0; i < particles.length; i++ )
 		{
 			var particle1 = particles[i];
+			var alt = getAltitude(particle1.position.x, particle1.position.z );
 
-			if ( particle1.position.y - radius <= ground.position.y )
+			if ( particle1.position.y - radius <= 0 )
 			{
-				particle1.position.y = ground.position.y + radius;
+				particle1.position.y = 0 + radius;
 				// particle1.direction.multiplyByFloats(0, 0, 0);
 			}
 			var right = limits[0];
@@ -285,6 +269,31 @@ particleSystem.updateFunction = function ( particles )
 				particle1.position.x = left + radius;
 				particle1.direction.x *= -0.8;
 			}
+			if (particle1.position.y  - (particle1.size / 2) <= getAltitude(particle1.position.x, particle1.position.z))
+			{
+				// console.log("collide");
+				var high = getAltitude(particle1.position.x, particle1.position.z);
+				if (high > getAltitude(particle1.position.x - 1, particle1.position.z - 1))
+				{
+					particle1.position.x--;
+					particle1.position.z--;
+				}
+				else if (high > getAltitude(particle1.position.x + 1, particle1.position.z + 1))
+				{
+					particle1.position.x++;
+					particle1.position.z++;
+				}
+				else if (high > getAltitude(particle1.position.x - 1, particle1.position.z + 1))
+				{
+					particle1.position.x--;
+					particle1.position.z++;
+				}
+				else if (high > getAltitude(particle1.position.x + 1, particle1.position.z - 1))
+				{
+					particle1.position.x++;
+					particle1.position.z--;
+				}
+			}
 			// particle1.direction.multiplyByFloats(0.001, 0.001, 0.001);
 		}
 
@@ -295,36 +304,38 @@ particleSystem.updateFunction = function ( particles )
 return scene;
 };
 
-var altitude = [];
-
-var CreateArrayOfAltitude = function( positions )
+var CreateArrayOfAltitude = function( positions)
 {
-	for ( var i = 0; i < mapSize[2] ; i++ )
+	for ( var i = 0; i < mapDiv ; i++ )
 	{
-		altitude[mapSize[2] - i - 50] = [];
-		for ( var j = 0; j < mapSize[2]; j++ )
+		altitude[mapDiv - i - 50] = [];
+		for ( var j = 0; j < mapDiv; j++ )
 		{
-			altitude[mapSize[2] - i - 50][j - 50] = positions[ getCustomIndex( i, j ) ];
+			altitude[mapDiv - i - 50][j - 50] = positions[ getCustomIndex( i, j ) ];
 		};
 	};
 };
 
 var getCustomIndex = function( x, y )
 {
-		return ( ( x * (mapSize[2] + 1) + y ) * 3 + 1 );
+		return ( ( x * (mapDiv + 1) + y ) * 3 + 1 );
 };
 
 var getAltitude = function( x, y )
 {
-	if ( (Math.round(y) >= altitude.length || Math.round(y) < -50 ) )
-		return 0;
-	console.log(Math.round( y ));
-	var alt =  altitude[Math.round( y )][Math.round( x )] + ground.position.y; 
+ if (isNaN(x) || isNaN(y))
+        return 0;
+    if ( (Math.round(y) >= altitude.length || Math.round(y) < -49 ) )
+        return 0;
+    if ( (Math.round(x) >= altitude[Math.round(y)].length || Math.round(x) < -49) )
+        return 0;
+    
+    var alt =  altitude[Math.round( y )][Math.round( x )] + ground.position.y; 
 
-	if (alt)
-		return alt;
-	else
-		return 0;
+    if (alt)
+        return alt;
+    else
+        return 0;
 };
 
 var detectSphereCollision = function(elem1, elem2)
