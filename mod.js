@@ -115,6 +115,11 @@ var mapSize = [100, 100, 100];
 var mountain1 = [10, 20, -10];
 var mountain2 = [20, 20, 0];
 var mountain3 = [20, 40, 0];
+mapDiv = mapSize[2];
+var sphere1 = BABYLON.Mesh.CreateSphere("sphere", 4.0, 2.0, scene);
+sphere1.position = new BABYLON.Vector3(10,20,-10);
+var sphere2 = BABYLON.Mesh.CreateSphere("sphere", 4.0, 2.0, scene);
+sphere2.position = new BABYLON.Vector3(20,20,0);
 
 ground = BABYLON.Mesh.CreateGround("ground", mapSize[0], mapSize[1], mapSize[2], scene);
 // ground.material = wireMaterial;
@@ -126,9 +131,10 @@ positions = createMountain(positions, mountain1, mapSize[2]);
 
 positions = createMountain(positions, mountain2, mapSize[2]);
 
+ground.setVerticesData(BABYLON.VertexBuffer.PositionKind, positions);
+
 ground.convertToFlatShadedMesh();
 
-mapDiv = mapSize[2];
 
 
 
@@ -164,13 +170,15 @@ particleSystem.maxEmitPower = 0.01;
 particleSystem.minSize = particlesSize;
 particleSystem.maxSize = particlesSize;
 
+// particleSystem.blendMode = BABYLON.ParticleSystem.BLEND_MODE_ONEONE;
+// particleSystem.textureMask = new BABYLON.Color4(0.1, 0.8, 0.8, 1.0);
 particleSystem.color1 = new BABYLON.Color4(0, 0.5, 1, 1);
 particleSystem.color2 = new BABYLON.Color4(0, 0.2, 0.5, 1);
 
 particleSystem.direction1 = new BABYLON.Vector3(0, -5, 0);
 particleSystem.direction2 = new BABYLON.Vector3(0.5, -5, 0.5);
 
-// particleSystem.blendMode = BABYLON.ParticleSystem.BLEND_MODE_ONEONE;
+
 
 particleSystem.gravity = new BABYLON.Vector3(0, -1, 0);
 particleSystem.maxAngularSpeed = 2;
@@ -184,9 +192,12 @@ var gravity = 0.38;
 
 particleSystem.updateFunction = function ( particles )
 {
+		var waterV = water.getVerticesData("position"); 
+		water.setVerticesData(BABYLON.VertexBuffer.PositionKind, waterV);
 		for ( var i = 0; i < particles.length; i++ )
 		{
 			var particle1 = particles[i];
+
 			if ( particle1.position.y + radius >= ground.position.y )
 			{
 				particle1.direction.y -= gravity/2; // gravity
@@ -302,23 +313,23 @@ particleSystem.updateFunction = function ( particles )
 			// particle1.direction.multiplyByFloats(0.001, 0.001, 0.001);
 		}
 
-	// var time = 0;
- //    var order = 0.1;
+	var time = 0;
+    var order = 0.1;
 
- //    scene.registerBeforeRender(function () {
- //        // Waiting for effect to be compiled
- //        if (!effect) {
- //            return;
- //        }
+    scene.registerBeforeRender(function () {
+        // Waiting for effect to be compiled
+        if (!effect) {
+            return;
+        }
 
- //        effect.setFloat("time", time);
+        effect.setFloat("time", time);
 
- //        time += order;
+        time += order;
 
- //        if (time > 100 || time < 0) {
- //            order *= -1;
- //        }
- //    });
+        if (time > 100 || time < 0) {
+            order *= -1;
+        }
+    });
 };
 
 /***********************************************************/
