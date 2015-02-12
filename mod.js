@@ -87,11 +87,7 @@ shader.backFaceCulling = false;
 skybox.material = shader;
 
 skybox.position.y = -80;
-/***********************************************************/
-// Fog
-//    var box = new BABYLON.Mesh(name, scene);
-//    var vertexData = BABYLON.VertexData.CreateBox(10);
-//    vertexData.applyToMesh(box, false);
+
 var colorMaterial = new BABYLON.StandardMaterial("ground", scene);
 colorMaterial.diffuseColor = BABYLON.Color3.FromInts(193, 181, 151);
 colorMaterial.specularColor = BABYLON.Color3.Black();
@@ -137,28 +133,15 @@ ground.convertToFlatShadedMesh();
 
 CreateArrayOfAltitude(positions);
 
-
-
-// var water = BABYLON.Mesh.CreateGround("water", mapSize[0], mapSize[1], mapSize[2], scene);
-// water.material = waterColor;
-// //water.material = 
-
-// water.position.y = -1;
-
-// Effect
-var effect = engine.createEffectForParticles("particle", ["time"]);
-
-
-var fountain = BABYLON.Mesh.CreateBox("foutain", 1.0, scene);
+var fountain = BABYLON.Mesh.CreateBox("fountain", 1.0, scene);
 fountain.position.x = 0;
 fountain.position.y = 100;
 
-// var particleSystem = new BABYLON.ParticleSystem("particles", 3000, scene, effect);
-var particleSystem = new BABYLON.ParticleSystem("particles", 2000, scene);
+var particleSystem = new BABYLON.ParticleSystem("particles", 3000, scene);
 particleSystem.particleTexture = new BABYLON.Texture("textures/water.jpg", scene);
 particleSystem.emitter = fountain; 
-particleSystem.minEmitBox = new BABYLON.Vector3(-1, 0, 0); // Starting all from
-particleSystem.maxEmitBox = new BABYLON.Vector3(1, 0, 0);
+// particleSystem.minEmitBox = new BABYLON.Vector3(-1, 0, 0); // Starting all from
+// particleSystem.maxEmitBox = new BABYLON.Vector3(1, 0, 0);
 particleSystem.emitRate = 200;
 
 
@@ -168,18 +151,15 @@ particleSystem.maxEmitPower = 0.01;
 particleSystem.minSize = particlesSize;
 particleSystem.maxSize = particlesSize;
 
-// particleSystem.blendMode = BABYLON.ParticleSystem.BLEND_MODE_ONEONE;
-// particleSystem.textureMask = new BABYLON.Color4(0.1, 0.8, 0.8, 1.0);
-particleSystem.color1 = new BABYLON.Color4(0, 0.5, 1, 1);
-particleSystem.color2 = new BABYLON.Color4(0, 0.2, 0.5, 1);
+particleSystem.blendMode = BABYLON.ParticleSystem.BLEND_MODE_ONEONE;
+particleSystem.textureMask = new BABYLON.Color4.FromInts(25, 25, 112, 255);
+particleSystem.color1 = new BABYLON.Color4.FromInts(20, 20, 255, 255);
+particleSystem.color2 = new BABYLON.Color4.FromInts(20, 20, 255, 255);
 
 particleSystem.direction1 = new BABYLON.Vector3(0, -5, 0);
 particleSystem.direction2 = new BABYLON.Vector3(0.5, -5, 0.5);
 
-
-
 particleSystem.gravity = new BABYLON.Vector3(0, -1, 0);
-particleSystem.maxAngularSpeed = 2;
 
 particleSystem.start();
 
@@ -298,7 +278,6 @@ particleSystem.updateFunction = function ( particles )
 		}
 };
 
-/***********************************************************/
 return scene;
 };
 
@@ -375,36 +354,3 @@ engine.runRenderLoop(function () {
 window.addEventListener("resize", function () {
 	engine.resize();
 });
-
-/*
-
-for (var i = 0; i < numberPoints; i+=3)
-{
-    if (positions[i] == pos[0] && positions[i+2] == pos[2] )
-    {
-		for ( var deg = 0; deg < 180; deg++ )
-		{
-			for (var dist = 0; dist < 20; dist++)
-			{
-				var x = dist * Math.cos(deg);
-				var y = dist * Math.sin(deg);
-				console.log("x:"+x);
-				positions[i - x * 101 * 3 + y + 1] = 10 + 10 * Math.cos( Math.PI / pos[1] * dist );
-				positions[i + x * 101 * 3 + y + 1] = 10 + 10 * Math.cos( Math.PI / pos[1] * dist );
-				positions[i - dist * 3 + 1 + 101 * 3 * x + y] = 10 + 10 * Math.cos( Math.PI / pos[1] * dist );
-				positions[i + dist * 3 + 1 + 101 * 3 * x + y] = 10 + 10 * Math.cos( Math.PI / pos[1] * dist );
-		//	var box = BABYLON.Mesh.CreateBox("box", 1.0, scene);
-		//	box.position.x = x;
-		//box.position.z = y;
-				console.log("-------");
-			}
-		}
-		
-
-			//positions[i - y * 3 + 1] = 10 + 10 * Math.cos( Math.PI / pos[1] * y );
-			//positions[i + y * 3 + 1] = 10 + 10 * Math.cos( Math.PI / pos[1] * y );
-		
-    }
-}
-*/
-
