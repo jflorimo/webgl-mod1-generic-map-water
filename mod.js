@@ -116,10 +116,10 @@ var mountain1 = [10, 20, -10];
 var mountain2 = [20, 20, 0];
 var mountain3 = [20, 40, 0];
 mapDiv = mapSize[2];
-var sphere1 = BABYLON.Mesh.CreateSphere("sphere", 4.0, 2.0, scene);
-sphere1.position = new BABYLON.Vector3(10,20,-10);
-var sphere2 = BABYLON.Mesh.CreateSphere("sphere", 4.0, 2.0, scene);
-sphere2.position = new BABYLON.Vector3(20,20,0);
+// var sphere1 = BABYLON.Mesh.CreateSphere("sphere", 4.0, 2.0, scene);
+// sphere1.position = new BABYLON.Vector3(10,20,-10);
+// var sphere2 = BABYLON.Mesh.CreateSphere("sphere", 4.0, 2.0, scene);
+// sphere2.position = new BABYLON.Vector3(20,20,0);
 
 ground = BABYLON.Mesh.CreateGround("ground", mapSize[0], mapSize[1], mapSize[2], scene);
 // ground.material = wireMaterial;
@@ -135,18 +135,15 @@ ground.setVerticesData(BABYLON.VertexBuffer.PositionKind, positions);
 
 ground.convertToFlatShadedMesh();
 
-
-
-
-var water = BABYLON.Mesh.CreateGround("water", mapSize[0], mapSize[1], mapSize[2], scene);
-water.material = waterColor;
-//water.material = 
-
-water.position.y = -1;
-
-
 CreateArrayOfAltitude(positions);
 
+
+
+// var water = BABYLON.Mesh.CreateGround("water", mapSize[0], mapSize[1], mapSize[2], scene);
+// water.material = waterColor;
+// //water.material = 
+
+// water.position.y = -1;
 
 // Effect
 var effect = engine.createEffectForParticles("particle", ["time"]);
@@ -156,8 +153,9 @@ var fountain = BABYLON.Mesh.CreateBox("foutain", 1.0, scene);
 fountain.position.x = 0;
 fountain.position.y = 100;
 
-var particleSystem = new BABYLON.ParticleSystem("particles", 3000, scene, effect);
-particleSystem.particleTexture = new BABYLON.Texture("textures/flares.png", scene);
+// var particleSystem = new BABYLON.ParticleSystem("particles", 3000, scene, effect);
+var particleSystem = new BABYLON.ParticleSystem("particles", 2000, scene);
+particleSystem.particleTexture = new BABYLON.Texture("textures/water.jpg", scene);
 particleSystem.emitter = fountain; 
 particleSystem.minEmitBox = new BABYLON.Vector3(-1, 0, 0); // Starting all from
 particleSystem.maxEmitBox = new BABYLON.Vector3(1, 0, 0);
@@ -192,8 +190,6 @@ var gravity = 0.38;
 
 particleSystem.updateFunction = function ( particles )
 {
-		var waterV = water.getVerticesData("position"); 
-		water.setVerticesData(BABYLON.VertexBuffer.PositionKind, waterV);
 		for ( var i = 0; i < particles.length; i++ )
 		{
 			var particle1 = particles[i];
@@ -244,22 +240,11 @@ particleSystem.updateFunction = function ( particles )
 					// particle2.direction.multiplyByFloats(0.001, 0.001, 0.001);
 				}
 			}
-			// if ( particle1.position.y + radius >= ground.position.y )
-			// {
-			// 	particle1.direction.y = -gravity/2; // gravity
-			// 	particle1.position = particle1.position.add( particle1.direction );
-			// 	particle1.direction.y -= -gravity/2; // gravity
-			// }
-		}
-		for ( var i = 0; i < particles.length; i++ )
-		{
-			var particle1 = particles[i];
 			var alt = getAltitude(particle1.position.x, particle1.position.z );
 
 			if ( particle1.position.y - radius <= 0 )
 			{
 				particle1.position.y = 0 + radius;
-				// particle1.direction.multiplyByFloats(0, 0, 0);
 			}
 			var right = limits[0];
 			if( particle1.position.x + radius >= right )//50
@@ -310,26 +295,7 @@ particleSystem.updateFunction = function ( particles )
 					particle1.position.z--;
 				}
 			}
-			// particle1.direction.multiplyByFloats(0.001, 0.001, 0.001);
 		}
-
-	var time = 0;
-    var order = 0.1;
-
-    scene.registerBeforeRender(function () {
-        // Waiting for effect to be compiled
-        if (!effect) {
-            return;
-        }
-
-        effect.setFloat("time", time);
-
-        time += order;
-
-        if (time > 100 || time < 0) {
-            order *= -1;
-        }
-    });
 };
 
 /***********************************************************/
