@@ -10,10 +10,12 @@ animate();
 function init() 
 {
 
-	camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-	camera.position.x = -8;
+	camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 1000 );
+	camera.position.x = 0;
 	camera.position.y = -100;
-	camera.position.z = 25;
+	camera.position.z = 20;
+
+	camera.lookAt(new THREE.Vector3( 1, 0, 0 ));
 
 	controls = new THREE.TrackballControls( camera );
 
@@ -34,7 +36,7 @@ function init()
 	// world
 
 	scene = new THREE.Scene();
-	scene.fog = new THREE.FogExp2( 0xcccccc, 0.002 );
+	scene.fog = new THREE.FogExp2( 0x000000, 0.002 );
 
 	axes = buildAxes( 10 );
 	scene.add( axes );
@@ -47,7 +49,7 @@ function init()
 
 	geometry.vertices = generateMountain(geometry.vertices, mountain1, 100);
 
-	var material = new THREE.MeshBasicMaterial({color: 0xff0000, wireframe: true});
+	var material = new THREE.MeshBasicMaterial({color: 0xcccccc, wireframe: true});
 	var plane = new THREE.Mesh( geometry, material );
 	scene.add( plane );
 
@@ -171,36 +173,4 @@ function generateMountain(vertices, mountain, div)
 		}
 	}
 	return vertices;
-}
-
-function createmountain( positions, vertexPoint, mapDiv )
-{
-	var coefWidth = 1;
-	var coefHeight = 0;
-	for (var i = 0; i < positions.length; i++)
-	{
-	    if ( positions[i].x == vertexPoint[0] && positions[i].z == vertexPoint[2] )
-	    {
-			
-			for ( var deg = 0; deg < 360; deg+= 0.1 )
-			{
-				for (var dist = 0; dist < vertexPoint[1]; dist+= 0.1)
-				{			
-					var x = Math.round(dist * Math.cos(Math.PI * deg / 180));
-					var z = Math.round(dist * Math.sin(Math.PI * deg / 180));
-					
-					var tabIndex = i + x *(mapDiv+1)*3 + z*3 + 1;
-
-					var ymid = vertexPoint[1]/2;
-					var ampl = vertexPoint[1]/2;
-
-					var heigh = ymid+coefHeight + ampl*coefWidth * Math.cos( Math.PI / vertexPoint[1] * dist );
-
-					if (positions[tabIndex] < heigh) 
-						positions[tabIndex] =  heigh;
-				}
-			}
-	    }
-	}
-	return positions;
 }
