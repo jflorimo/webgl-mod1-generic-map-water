@@ -4,6 +4,10 @@ var camera, controls, scene, renderer, axes;
 
 var cross;
 
+var particleSystem;
+var particles;
+var particleCount;
+
 init();
 animate();
 
@@ -52,7 +56,45 @@ function init()
 	var material = new THREE.MeshBasicMaterial({color: 0xcccccc, wireframe: true});
 	var plane = new THREE.Mesh( geometry, material );
 	scene.add( plane );
+/**********************************************************/
+/**********************************************************/
+particleCount = 58000;
+particles = new THREE.Geometry();
+var pMaterial = new THREE.PointCloudMaterial({
+  color: 0xFFFFFF,
+  size: 1,
+  map: THREE.ImageUtils.loadTexture(
+    "water.png"
+  )
+});
 
+
+
+// now create the individual particles
+for (var p = 0; p < particleCount; p++) 
+{
+	// create a particle with random
+	// position values, -250 -> 250
+	var pX = Math.random() * 100 - 50;
+	var pY = Math.random() * 100 - 50;
+	var pZ = 25;
+	var particle = new THREE.Vector3(pX, pY, pZ);
+	particle.velocity = new THREE.Vector3(0, 0, -0.5);
+	// add it to the geometry
+	particles.vertices.push(particle);
+}
+
+// create the particle system
+particleSystem = new THREE.PointCloud( particles, pMaterial);
+particleSystem.sortParticles = true;
+particleSystem.geometry.verticesNeedUpdate = true;
+// add it to the scene
+scene.add(particleSystem);
+
+
+
+/**********************************************************/
+/**********************************************************/
 
 	// lights
 
@@ -100,10 +142,26 @@ function animate()
 {
 	requestAnimationFrame( animate );
 	controls.update();
+	render();
 }
 
 function render() 
 {
+	var pCount = 100;
+	
+	while (pCount--) {
+
+		// get the particle
+		var particle = particles.vertices[pCount];
+		// check if we need to reset
+		if (particle.z < 0) 
+		{
+			particle.z = 200;
+		}
+		particle.velocity.z -= Math.random() * .1;
+		particle.z -= 1;
+	}
+	// particleSystem.geometry.__dirtyVertices = true;
 	renderer.render( scene, camera );
 }
 
@@ -150,7 +208,6 @@ function generateMountain(vertices, mountain, div)
 	{
 		if(vertices[i].x == mountain[0] && vertices[i].y == mountain[1])
 		{
-			console.log("trouver");
 			vertices[i].z = 10;
 			for ( var deg = 0; deg < 360; deg+= 0.1 )
 			{
