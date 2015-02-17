@@ -142,31 +142,30 @@ function onWindowResize()
 
 function animate() 
 {
-	requestAnimationFrame( animate );
 	controls.update();
 	render();
+	requestAnimationFrame( animate );
 }
 
 function render() 
 {
 	// var delta = clock.getDelta()
 	// var t = clock.getElapsedTime() * 0.5;
-	var pCount = 100;
+	var pCount = particleCount;
 	
 	while (pCount--) {
 
 		// get the particle
 		var particle = particles.vertices[pCount];
 		// check if we need to reset
-		if (particle.z < 0) 
+		if (particle.z > 0.5) 
 		{
-			particle.z = 200;
+			particle.velocity.z -= Math.random() * .1;
+			particle.z -= 0.05;
 		}
-		particle.velocity.z -= Math.random() * .1;
-		particle.z -= 0.01;
+
 	}
 	particleSystem.geometry.verticesNeedUpdate = true;
-	// particleSystem.geometry.__dirtyVertices = true;
 	renderer.render( scene, camera );
 }
 
