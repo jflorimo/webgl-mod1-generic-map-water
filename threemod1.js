@@ -8,6 +8,8 @@ var particleSystem;
 var particles;
 var particleCount;
 
+var clock = new THREE.Clock();
+
 init();
 animate();
 
@@ -147,6 +149,8 @@ function animate()
 
 function render() 
 {
+	// var delta = clock.getDelta()
+	// var t = clock.getElapsedTime() * 0.5;
 	var pCount = 100;
 	
 	while (pCount--) {
@@ -159,8 +163,9 @@ function render()
 			particle.z = 200;
 		}
 		particle.velocity.z -= Math.random() * .1;
-		particle.z -= 1;
+		particle.z -= 0.01;
 	}
+	particleSystem.geometry.verticesNeedUpdate = true;
 	// particleSystem.geometry.__dirtyVertices = true;
 	renderer.render( scene, camera );
 }
