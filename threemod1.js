@@ -10,6 +10,12 @@ var particleCount;
 
 var clock = new THREE.Clock();
 
+var mapSize = [100, 100, 100];
+var mapDiv = mapSize[2];
+var gravity = 0.38;
+var particlesSize = 3.5;
+var radius = particlesSize/2;
+
 init();
 animate();
 
@@ -60,11 +66,11 @@ function init()
 	scene.add( plane );
 /**********************************************************/
 /**********************************************************/
-particleCount = 50000;
+particleCount = 5000;
 particles = new THREE.Geometry();
 var pMaterial = new THREE.PointCloudMaterial({
   color: 0xFFFFFF,
-  size: 1,
+  size: particlesSize,
   map: THREE.ImageUtils.loadTexture(
     "water.png"
   )
@@ -161,8 +167,8 @@ function render()
 		// check if we need to reset
 		if (particle.z > 0.5) 
 		{
-			particle.velocity.z -= Math.random() * .1;
-			particle.z -= 0.05;
+			particle.velocity.z = -0.05;
+			particle.add(particle.velocity);
 		}
 
 	}
