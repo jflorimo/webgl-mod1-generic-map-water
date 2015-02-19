@@ -87,7 +87,7 @@ for (var p = 0; p < particleCount; p++)
 	var pY = Math.random() * 100 - 50;
 	var pZ = 25;
 	var particle = new THREE.Vector3(pX, pY, pZ);
-	particle.velocity = new THREE.Vector3(0, 0, -0.5);
+	particle.velocity = new THREE.Vector3(0, 0, -gravity);
 	// add it to the geometry
 	particles.vertices.push(particle);
 }
@@ -163,12 +163,16 @@ function render()
 	{
 
 		// get the particle
-		var particle = particles.vertices[i];
+		var particle1 = particles.vertices[i];
 		// check if we need to reset
-		if (particle.z > 0.5) 
+		// if (particle.z > 0.5) 
+		// {
+		// 	particle.velocity.z = -0.05;
+		// 	particle.add(particle.velocity);
+		// }
+		if (particle1.z + radius >= 0 + particlesSize)
 		{
-			particle.velocity.z = -0.05;
-			particle.add(particle.velocity);
+			particle1.add(particle1.velocity);
 		}
 
 	}
