@@ -60,7 +60,7 @@ function init()
 	scene.add( plane );
 /**********************************************************/
 /**********************************************************/
-particleCount = 58000;
+particleCount = 50000;
 particles = new THREE.Geometry();
 var pMaterial = new THREE.PointCloudMaterial({
   color: 0xFFFFFF,
@@ -153,10 +153,11 @@ function render()
 	// var t = clock.getElapsedTime() * 0.5;
 	var pCount = particleCount;
 	
-	while (pCount--) {
+	for(var i = 0; i < pCount; i++)
+	{
 
 		// get the particle
-		var particle = particles.vertices[pCount];
+		var particle = particles.vertices[i];
 		// check if we need to reset
 		if (particle.z > 0.5) 
 		{
