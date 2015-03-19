@@ -134,36 +134,19 @@ ground.convertToFlatShadedMesh();
 
 CreateArrayOfAltitude(positions);
 
-var fountain = BABYLON.Mesh.CreateBox("fountain", 1.0, scene);
-fountain.position.x = 0;
-fountain.position.y = 100;
-var numParticles = 3000;
+
+var numParticles = 5000;
 var particleSystem = new BABYLON.ParticleSystem("particles", numParticles, scene);
-particleSystem.particleTexture = new BABYLON.Texture("textures/water.jpg", scene);
-particleSystem.emitter = fountain; 
-// particleSystem.minEmitBox = new BABYLON.Vector3(-1, 0, 0); // Starting all from
-// particleSystem.maxEmitBox = new BABYLON.Vector3(1, 0, 0);
-particleSystem.emitRate = 200;
 
-
-particleSystem.minEmitPower = 0.01;
-particleSystem.maxEmitPower = 0.01;
-
-particleSystem.minSize = particlesSize;
-particleSystem.maxSize = particlesSize;
-
-particleSystem.blendMode = BABYLON.ParticleSystem.BLEND_MODE_ONEONE;
-particleSystem.textureMask = new BABYLON.Color4.FromInts(25, 25, 112, 255);
-particleSystem.color1 = new BABYLON.Color4.FromInts(20, 20, 255, 255);
-particleSystem.color2 = new BABYLON.Color4.FromInts(20, 20, 255, 255);
-
-particleSystem.direction1 = new BABYLON.Vector3(0, -5, 0);
-particleSystem.direction2 = new BABYLON.Vector3(0.5, -5, 0.5);
-
-particleSystem.gravity = new BABYLON.Vector3(0, -1, 0);
-
-particleSystem.start();
-
+//rain
+// spreadWater(particleSystem, 0, 100, 80, 200, particlesSize + 0.2, scene);
+//vague
+// spreadWater(particleSystem, -50, 0, 0, 2000, particlesSize + 0.2, scene);
+//up
+spreadWater(particleSystem, -25, 0, 0, 1000, particlesSize + 3.8, scene);
+particleSystem.minEmitBox = new BABYLON.Vector3(-20, 0, -50);
+particleSystem.maxEmitBox = new BABYLON.Vector3(70, 0, 50);
+particleSystem.gravity = new BABYLON.Vector3(0, -0.02, 0);
 //limits = [right, left, up, down]
 // var limits = [-30, -50, 10, -10];
 var limits = [50, -50, 50, -50];
@@ -175,135 +158,149 @@ tree = new OCTREE.tree(5,10,20);
 
 particleSystem.updateFunction = function ( particles )
 {
+		for ( var i = 0; i < particles.length; i++ )
+		{
+			var particle1 = particles[i];
 
-		// if( truc.getCount() < numParticles)
-		// {
-		// 	for ( var i = 0; i < particles.length; i++ )
-		// 	{
-		// 		truc.set(particles[i].position.x, particles[i].position.z, particles[i].position.y);
-		// 		particles[i].direction.y -= gravity/2; // gravity
-		// 		particles[i].position = particles[i].position.add( particles[i].direction );
-		// 		particles[i].direction.y = -gravity/2; // gravity
-		// 		truc.find_(truc,particles[i].position.x, particles[i].position.z);
-		// 	}
-		// }
+			if ( particle1.position.y + radius >= ground.position.y )
+			{
+				particle1.direction.y -= gravity/2; // gravity
+				particle1.position = particle1.position.add( particle1.direction );
+				particle1.direction.y = -gravity/2; // gravity
+				// particle1.direction.scaleToRef(this._scaledUpdateSpeed, this._scaledDirection);
+				// particle1.position.addInPlace(this._scaledDirection);
 
+				// this.gravity.scaleToRef(this._scaledUpdateSpeed, this._scaledGravity);
+				// particle1.direction.addInPlace(this._scaledGravity);
+			}
+			for (var j = i + 1; j < particles.length; j++)
+			{
+				var particle2 = particles[j];
+				if (detectSphereCollision(particle1, particle2))
+				{
+					var delta = particle1.position.subtract(particle2.position);
+					var d = delta.length();
 
+					var tmp = ( (particlesSize) -d ) / d;
+					var mtd = delta.multiplyByFloats( tmp, tmp, tmp );
 
-
-		// for ( var i = 0; i < particles.length; i++ )
-		// {
-		// 	var particle1 = particles[i];
-
-		// 	if ( particle1.position.y + radius >= ground.position.y )
-		// 	{
-		// 		particle1.direction.y -= gravity/2; // gravity
-		// 		particle1.position = particle1.position.add( particle1.direction );
-		// 		particle1.direction.y = -gravity/2; // gravity
-		// 		// particle1.direction.scaleToRef(this._scaledUpdateSpeed, this._scaledDirection);
-		// 		// particle1.position.addInPlace(this._scaledDirection);
-
-		// 		// this.gravity.scaleToRef(this._scaledUpdateSpeed, this._scaledGravity);
-		// 		// particle1.direction.addInPlace(this._scaledGravity);
-		// 	}
-		// 	for (var j = i + 1; j < particles.length; j++)
-		// 	{
-		// 		var particle2 = particles[j];
-		// 		if (detectSphereCollision(particle1, particle2))
-		// 		{
-		// 			var delta = particle1.position.subtract(particle2.position);
-		// 			var d = delta.length();
-
-		// 			var tmp = ( (particlesSize) -d ) / d;
-		// 			var mtd = delta.multiplyByFloats( tmp, tmp, tmp );
-
-		// 			var im1 = 1 / 5; 
-		// 			var im2 = 1 / 5;
+					var im1 = 1 / 5; 
+					var im2 = 1 / 5;
 			
-		// 			var tmp1 = im1 / ( im1 + im2 );
-		// 			particle1.position.addInPlace( mtd.multiplyByFloats( tmp1, tmp1, tmp1 ) );
-		// 			var tmp2 = im2 / ( im1 + im2 );
-		// 			particle2.position.subtractInPlace( mtd.multiplyByFloats( tmp2, tmp2, tmp2 ) );
+					var tmp1 = im1 / ( im1 + im2 );
+					particle1.position.addInPlace( mtd.multiplyByFloats( tmp1, tmp1, tmp1 ) );
+					var tmp2 = im2 / ( im1 + im2 );
+					particle2.position.subtractInPlace( mtd.multiplyByFloats( tmp2, tmp2, tmp2 ) );
 				
-		// 			var v = particle1.direction.subtract( particle2.direction );
-		// 			var vn = BABYLON.Vector3.Dot( v, mtd.normalize() );
+					var v = particle1.direction.subtract( particle2.direction );
+					var vn = BABYLON.Vector3.Dot( v, mtd.normalize() );
 					
-		// 			if (vn < 0.0)
-		// 			{
-		// 				var reduction = 0.5;
-		// 				var i_ = ( -( 1.0 + reduction ) * vn ) / ( im1 + im2 );
-		// 				var impulse = mtd.normalize().multiplyByFloats( i_, i_, i_ );
+					if (vn < 0.0)
+					{
+						var reduction = 0.5;
+						var i_ = ( -( 1.0 + reduction ) * vn ) / ( im1 + im2 );
+						var impulse = mtd.normalize().multiplyByFloats( i_, i_, i_ );
 
-		// 				particle1.direction.addInPlace( impulse.multiplyByFloats( im1, im1, im1 ) );
-		// 				particle2.direction.subtractInPlace( impulse.multiplyByFloats( im2, im2, im2 ) );
-		// 			}
-		// 			// particle1.direction.multiplyByFloats(0.001, 0.001, 0.001);
-		// 			// particle2.direction.multiplyByFloats(0.001, 0.001, 0.001);
-		// 		}
-		// 	}
-		// 	var alt = getAltitude(particle1.position.x, particle1.position.z );
+						particle1.direction.addInPlace( impulse.multiplyByFloats( im1, im1, im1 ) );
+						particle2.direction.subtractInPlace( impulse.multiplyByFloats( im2, im2, im2 ) );
+					}
+					// particle1.direction.multiplyByFloats(0.001, 0.001, 0.001);
+					// particle2.direction.multiplyByFloats(0.001, 0.001, 0.001);
+				}
+			}
+			var alt = getAltitude(particle1.position.x, particle1.position.z );
 
-		// 	if ( particle1.position.y - radius <= 0 )
-		// 	{
-		// 		particle1.position.y = 0 + radius;
-		// 	}
-		// 	var right = limits[0];
-		// 	if( particle1.position.x + radius >= right )//50
-		// 	{
-		// 		particle1.position.x = right - radius;
-		// 		particle1.direction.x *= -0.8;
-		// 	}
-		// 	var up = limits[2];
-		// 	if( particle1.position.z + radius >= up )//50
-		// 	{
-		// 		particle1.position.z = up - radius;
-		// 		particle1.direction.z *= -0.8;
-		// 	}
-		// 	var down = limits[3];
-		// 	if( particle1.position.z - radius <= down )//-50
-		// 	{
-		// 		particle1.position.z = down + radius;
-		// 		particle1.direction.z *= -0.8;
-		// 	}
-		// 	var left = limits[1];
-		// 	if( particle1.position.x - radius <= left )//-50
-		// 	{
-		// 		particle1.position.x = left + radius;
-		// 		particle1.direction.x *= -0.8;
-		// 	}
-		// 	if (particle1.position.y  - (particle1.size / 2) <= getAltitude(particle1.position.x, particle1.position.z))
-		// 	{
-		// 		// console.log("collide");
-		// 		var high = getAltitude(particle1.position.x, particle1.position.z);
-		// 		if (high > getAltitude(particle1.position.x - 1, particle1.position.z - 1))
-		// 		{
-		// 			particle1.position.x--;
-		// 			particle1.position.z--;
-		// 		}
-		// 		else if (high > getAltitude(particle1.position.x + 1, particle1.position.z + 1))
-		// 		{
-		// 			particle1.position.x++;
-		// 			particle1.position.z++;
-		// 		}
-		// 		else if (high > getAltitude(particle1.position.x - 1, particle1.position.z + 1))
-		// 		{
-		// 			particle1.position.x--;
-		// 			particle1.position.z++;
-		// 		}
-		// 		else if (high > getAltitude(particle1.position.x + 1, particle1.position.z - 1))
-		// 		{
-		// 			particle1.position.x++;
-		// 			particle1.position.z--;
-		// 		}
-		// 	}
-		// }
-		// if( truc.getCount() < numParticles)
-		// {
-		// 	truc.clear();
-		// }
+			if ( particle1.position.y - radius <= 0 )
+			{
+				particle1.position.y = 0 + radius;
+			}
+			var right = limits[0];
+			if( particle1.position.x + radius >= right )//50
+			{
+				particle1.position.x = right - radius;
+				particle1.direction.x *= -0.8;
+			}
+			var up = limits[2];
+			if( particle1.position.z + radius >= up )//50
+			{
+				particle1.position.z = up - radius;
+				particle1.direction.z *= -0.8;
+			}
+			var down = limits[3];
+			if( particle1.position.z - radius <= down )//-50
+			{
+				particle1.position.z = down + radius;
+				particle1.direction.z *= -0.8;
+			}
+			var left = limits[1];
+			if( particle1.position.x - radius <= left )//-50
+			{
+				particle1.position.x = left + radius;
+				particle1.direction.x *= -0.8;
+			}
+			if (particle1.position.y  - (particle1.size / 2) <= getAltitude(particle1.position.x, particle1.position.z))
+			{
+				// console.log("collide");
+				var high = getAltitude(particle1.position.x, particle1.position.z);
+				if (high > getAltitude(particle1.position.x - 1, particle1.position.z - 1))
+				{
+					particle1.position.x--;
+					particle1.position.z--;
+				}
+				else if (high > getAltitude(particle1.position.x + 1, particle1.position.z + 1))
+				{
+					particle1.position.x++;
+					particle1.position.z++;
+				}
+				else if (high > getAltitude(particle1.position.x - 1, particle1.position.z + 1))
+				{
+					particle1.position.x--;
+					particle1.position.z++;
+				}
+				else if (high > getAltitude(particle1.position.x + 1, particle1.position.z - 1))
+				{
+					particle1.position.x++;
+					particle1.position.z--;
+				}
+			}
+		}
 };
 
 return scene;
+};
+
+var spreadWater = function(particleSystem, x, y, z, er, size, scene)
+{
+	var fountain = BABYLON.Mesh.CreateBox("fountain", 1.0, scene);
+	fountain.position.x = x;
+	fountain.position.y = y;
+	fountain.position.y = z;
+ 	fountain.isVisible = false;
+
+	particleSystem.particleTexture = new BABYLON.Texture("textures/water.jpg", scene);
+	particleSystem.emitter = fountain; 
+	// particleSystem.minEmitBox = new BABYLON.Vector3(-1, 0, 0); // Starting all from
+	// particleSystem.maxEmitBox = new BABYLON.Vector3(1, 0, 0);
+	particleSystem.emitRate = er;
+
+
+	particleSystem.minEmitPower = 0.01;
+	particleSystem.maxEmitPower = 0.01;
+
+	particleSystem.minSize = size;
+	particleSystem.maxSize = size;
+
+	particleSystem.blendMode = BABYLON.ParticleSystem.BLEND_MODE_ONEONE;
+	particleSystem.textureMask = new BABYLON.Color4.FromInts(25, 25, 112, 255);
+	particleSystem.color1 = new BABYLON.Color4.FromInts(20, 20, 255, 255);
+	particleSystem.color2 = new BABYLON.Color4.FromInts(20, 20, 255, 255);
+
+	particleSystem.direction1 = new BABYLON.Vector3(0, -5, 0);
+	particleSystem.direction2 = new BABYLON.Vector3(0.5, -5, 0.5);
+
+	particleSystem.gravity = new BABYLON.Vector3(0, -1, 0);
+
+	particleSystem.start();
 };
 
 var CreateArrayOfAltitude = function( positions)
