@@ -124,9 +124,13 @@ ground.material = colorMaterial;
     
 var positions = ground.getVerticesData("position");  
 
-positions = createMountain(positions, mountain1, mapSize[2]);
+for(var i= 0; i < param_map.length; i++)
+{
+	positions = createMountain(positions, param_map[i], mapSize[2]);
+}
+// positions = createMountain(positions, mountain1, mapSize[2]);
 
-positions = createMountain(positions, mountain2, mapSize[2]);
+// positions = createMountain(positions, mountain2, mapSize[2]);
 
 ground.setVerticesData(BABYLON.VertexBuffer.PositionKind, positions);
 
@@ -135,24 +139,29 @@ ground.convertToFlatShadedMesh();
 CreateArrayOfAltitude(positions);
 
 
-var numParticles = 5000;
+var numParticles = 3500;
 var particleSystem = new BABYLON.ParticleSystem("particles", numParticles, scene);
+console.log(param_mod);
+if (param_mod == "water")
+{
+	spreadWater(particleSystem, -25, 3, 0, 1000, particlesSize + 3.8, scene);
+	particleSystem.minEmitBox = new BABYLON.Vector3(-20, 0, -50);
+	particleSystem.maxEmitBox = new BABYLON.Vector3(70, 0, 50);
+	particleSystem.gravity = new BABYLON.Vector3(0, -0.02, 0);	
+}
+else if (param_mod == "wave")
+{
+	spreadWater(particleSystem, -50, 0, 0, 2000, particlesSize + 0.5, scene);
+}
+else
+{
+	spreadWater(particleSystem, 0, 100, 80, 200, particlesSize + 0.2, scene);
+}
 
-//rain
-// spreadWater(particleSystem, 0, 100, 80, 200, particlesSize + 0.2, scene);
-//vague
-// spreadWater(particleSystem, -50, 0, 0, 2000, particlesSize + 0.2, scene);
-//up
-spreadWater(particleSystem, -25, 0, 0, 1000, particlesSize + 3.8, scene);
-particleSystem.minEmitBox = new BABYLON.Vector3(-20, 0, -50);
-particleSystem.maxEmitBox = new BABYLON.Vector3(70, 0, 50);
-particleSystem.gravity = new BABYLON.Vector3(0, -0.02, 0);
 //limits = [right, left, up, down]
 // var limits = [-30, -50, 10, -10];
 var limits = [50, -50, 50, -50];
 var gravity = 0.38;
-
-// truc = new goog.structs.QuadTree(-50,-50,50,50); 
 
 tree = new OCTREE.tree(5,10,20);
 

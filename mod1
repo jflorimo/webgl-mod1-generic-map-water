@@ -1,0 +1,44 @@
+#!/bin/bash
+if [ "$1" == "" ] ; then
+	echo 'Usage: mod1 <map.mod1> [water, wave, rain]';
+	exit 0;
+fi
+
+if [ ! -f $1 ]; then
+	echo 'Error:' $1 'is not a file';
+	exit 0;
+fi
+
+ok=0
+
+if [ "$2" == "" ] ; then
+	echo -n "var param_mod = \"rain\";" > .params.js;
+	ok=1
+fi
+
+if [ "$2" == "water" ] ; then
+	echo -n "var param_mod = \"water\";" > .params.js;
+	ok=1
+fi
+
+if [ "$2" == "rain" ] ; then
+	echo -n "var param_mod = \"rain\";" > .params.js;
+	ok=1
+fi
+
+if [ "$2" == "wave" ] ; then
+	echo -n "var param_mod = \"wave\";" > .params.js;
+	ok=1
+fi
+
+if [ "$ok" -eq 0 ] ; then
+	echo 'Usage: mod1 <map.mod1> [water, wave, rain]';
+	exit 0;
+fi
+
+echo -n "var param_map = [" >> .params.js;
+cat $1 | sed -e "s/(/[/g" |  sed -e "s/)/]/g" | tr -d "\n">> .params.js
+if [ $? == 0 ]; then
+	echo -n "];" >> .params.js
+	open "index.html";
+fi
